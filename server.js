@@ -38,6 +38,7 @@ mongoClient.connect(url, (err, client) => {
 
 var initDb = (db) => {
     // initMovies(db);
+  // initUsers(db);
     // clearDb(db);
 };
 
@@ -108,13 +109,14 @@ var initMovies = (db) => {
         });
 };
 
-// var initUsers = (db) => {
-//   db.createCollection('users', { capped: false, autoIndexId: true}, (err, result) => {
-//     console.log('Collection "users" created');
-//   });
-//   db.collection('users').insertOne({
-//     username: 'admin',
-//     password: 'admin',
-//     role: '2'
-//   });
-// };
+var initUsers = (db) => {
+  db.createCollection('users', { capped: false, autoIndexId: true}, (err, result) => {
+    console.log('Collection "users" created');
+  });
+  db.collection('users').insertOne({
+    username: 'admin',
+    password: 'admin',
+    role: '2',
+    favIds: []
+  });
+};

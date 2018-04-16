@@ -81,6 +81,13 @@ module.exports = (app, db) => {
     });
 
     app.post('/login', (req, res) => {
-        res.send('POST /login');
+      db.collection('users').findOne({
+        'username': req.body.username,
+        'password': req.body.password
+      }, (err, result) => {
+        if (err) throw err;
+        console.log(result);
+        res.send(result);
+      });
     });
 };
