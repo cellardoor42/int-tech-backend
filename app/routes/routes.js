@@ -90,4 +90,12 @@ module.exports = (app, db) => {
         res.send(result);
       });
     });
+
+    app.post('/login/:id', (req, res) => {
+      let _objId = req.params.id;
+      db.collection('users').findOne(ObjectId(_objId), (err, result) => {
+        if (err) throw err;
+        res.send(result);
+      });
+    })
 };
