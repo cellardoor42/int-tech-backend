@@ -4,17 +4,30 @@ module.exports = (app, db) => {
     app.get('/movies', (req, res) => {
         let _params = {};
         for (let property in req.query) {
-            if (req.query.hasOwnProperty(property) && property !== 'title') {
-              if (property === 'director') {
-                _params[property] = {$regex: req.query[property]};
-              } else {
-                _params[property] = req.query[property];
+            if (req.query.hasOwnProperty(property)) {
+              switch (property) {
+                case 'director': case 'title': {
+                  if (req.query[property] !== undefined) {
+                    _params[property] = {$regex: req.query[property]};
+                  }
+                  break;
+                }
+                case 'genre': {
+                  let _query = req.query[property].split(',');
+                  _params[property] = {$all: _query};
+                  // _params[property] = _query;
+                  break;
+                }
+                default: {
+                  _params[property] = req.query[property];
+                  break;
+                }
               }
             }
         }
-        if (req.query.title !== undefined) {
-            _params.title = {$regex: req.query.title};
-        }
+        // if (req.query.title !== undefined) {
+        //     _params.title = {$regex: req.query.title};
+        // }
         console.log('GET /movies', _params);
         db.collection('movies').find(_params).toArray((err, result) => {
             if (err) throw err;
