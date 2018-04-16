@@ -1,5 +1,5 @@
 module.exports = (app, db) => {
-    // var ObjectId = require('mongodb').ObjectId;
+    var ObjectId = require('mongodb').ObjectId;
 
     app.get('/movies', (req, res) => {
         let _params = {};
@@ -15,7 +15,6 @@ module.exports = (app, db) => {
                 case 'genre': {
                   let _query = req.query[property].split(',');
                   _params[property] = {$all: _query};
-                  // _params[property] = _query;
                   break;
                 }
                 default: {
@@ -25,23 +24,21 @@ module.exports = (app, db) => {
               }
             }
         }
-        // if (req.query.title !== undefined) {
-        //     _params.title = {$regex: req.query.title};
-        // }
         console.log('GET /movies', _params);
         db.collection('movies').find(_params).toArray((err, result) => {
             if (err) throw err;
             res.send(result);
         });
-
-        // db.collection('movies').find(ObjectId('5ad391d2d8708f354ccf4f1b')).toArray((err, result) => {
-        //     if (err) throw err;
-        //     console.log(result);
-        // });
     });
 
-    app.get('/movies/id', (req, res) => {
-        res.send('GET /movies/id');
+    app.get('/movies/:id', (req, res) => {
+        // res.send('GET /movies/id');
+      let _objId = req.params.id;
+      console.log(_objId);
+      db.collection('movies').findOne(ObjectId(_objId), (err, result) => {
+        if (err) throw err;
+        res.send(result);
+      });
     });
 
     app.delete('/movies/id', (req, res) => {
