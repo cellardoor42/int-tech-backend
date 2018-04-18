@@ -79,10 +79,6 @@ module.exports = (app, db) => {
         res.send('GET /users');
     });
 
-    app.get('/users/id', (req, res) => {
-        res.send('GET /users/id');
-    });
-
     app.get('/user_roles', (req, res) => {
         res.send('GET /user_roles');
     });
@@ -99,6 +95,20 @@ module.exports = (app, db) => {
         if (err) throw err;
         res.send(result.ops);
       });
+    });
+
+    app.post('/profile', (req, res) => {
+      // res.send('EDIT PROFILE');
+      let _query = { _id: ObjectId(req.body.userId) };
+      let _data = { $set: {
+        'username': req.body.username,
+        'password': req.body.password
+      }};
+      db.collection('users').updateOne(_query, _data, (err, result) => {
+        if (err) throw err;
+        res.send(result.ops);
+        console.log(result.ops)
+      })
     });
 
     app.post('/login', (req, res) => {
