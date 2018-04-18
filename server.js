@@ -38,18 +38,26 @@ mongoClient.connect(url, (err, client) => {
 });
 
 var initDb = (db) => {
-    // initMovies(db);
+  //   clearMovies(db);
+  // clearUsers(db);
+  // initMovies(db);
   // initUsers(db);
-    // clearDb(db);
+
 };
 
-var clearDb = (db) => {
+var clearMovies = (db) => {
     db.collection('movies').removeMany({});
     console.log('Collection "movies" cleared');
 };
 
+var clearUsers = (db) => {
+  db.collection('users').removeMany({});
+  console.log('Collection "users" cleared');
+}
+
 var initMovies = (db) => {
-    db.createCollection('movies', { capped: false, autoIndexId: true}, (err, result) => {
+    db.createCollection('movies', { capped: false, autoIndexId: true }, (err, result) => {
+      if (err) throw err;
         console.log('Collection "movies" created');
     });
     db.collection('movies').insertMany([

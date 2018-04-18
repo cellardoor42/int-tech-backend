@@ -9,6 +9,8 @@ module.exports = (app, db) => {
                 case 'director': case 'title': {
                   if (req.query[property] !== undefined) {
                     _params[property] = {$regex: req.query[property]};
+                    // let  _regex = new RegExp(["^", req.query[property], "$"].join(""), "i");
+                    // _params[property] = _regex;
                   }
                   break;
                 }
@@ -69,7 +71,7 @@ module.exports = (app, db) => {
       let _data = { $set: { 'favIds': req.body.favIds } };
       db.collection('users').updateOne(_query, _data, (err, result) => {
         if (err) throw err;
-        res.send(result);
+        res.send(result.ops);
       })
     });
 
@@ -86,7 +88,17 @@ module.exports = (app, db) => {
     });
 
     app.post('/users', (req, res) => {
-        res.send('POST /users (sign_up)');
+        // res.send('POST /users (sign_up)');
+      let _user = {
+        username: req.body.username,
+        password: req.body.password,
+        userRole: '1',
+        favIds: []
+      };
+      db.collection('users').insertOne(_user, (err, result) => {
+        if (err) throw err;
+        res.send(result.ops);
+      });
     });
 
     app.post('/login', (req, res) => {
