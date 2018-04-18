@@ -10,6 +10,7 @@ const url = 'mongodb://localhost:27017/db';
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 // mongoClient.connect(url, (err, db) => {
 //     if (err) throw err;

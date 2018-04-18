@@ -52,7 +52,7 @@ module.exports = (app, db) => {
             year: req.body.year,
             genre: req.body.genre,
             rating: req.body.rating
-        }
+        };
         db.collection('movies').insertOne(_movie, (error, result) => {
             if (error) {
                 res.send({ 'error': 'An error has occured'} );
@@ -62,6 +62,15 @@ module.exports = (app, db) => {
             }
         });
         // res.send('POST /movies');
+    });
+
+    app.post('/favs', (req, res) => {
+      let _query = { _id: ObjectId(req.body.userId) };
+      let _data = { $set: { 'favIds': req.body.favIds } };
+      db.collection('users').updateOne(_query, _data, (err, result) => {
+        if (err) throw err;
+        res.send(result);
+      })
     });
 
     app.get('/users', (req, res) => {
