@@ -43,10 +43,6 @@ module.exports = (app, db) => {
       });
     });
 
-    app.delete('/movies/id', (req, res) => {
-        res.send('DELETE /movies/id');
-    });
-
     app.post('/movies', (req, res) => {
         let _movie = {
             title: req.body.title,
@@ -76,11 +72,11 @@ module.exports = (app, db) => {
     });
 
     app.get('/users', (req, res) => {
-        res.send('GET /users');
-    });
-
-    app.get('/user_roles', (req, res) => {
-        res.send('GET /user_roles');
+        // res.send('GET /users');
+      db.collection('users').find({}).toArray((err, result) => {
+        if (err) throw err;
+        res.send(result);
+      });
     });
 
     app.post('/users', (req, res) => {
@@ -88,10 +84,18 @@ module.exports = (app, db) => {
       let _user = {
         username: req.body.username,
         password: req.body.password,
-        userRole: '1',
+        role: '1',
         favIds: []
       };
       db.collection('users').insertOne(_user, (err, result) => {
+        if (err) throw err;
+        res.send(result.ops);
+      });
+    });
+
+    app.post('/delete_user', (req, res) => {
+      let _query = { _id: ObjectId(req.body.userId) };
+      db.collection('users').deleteOne(_query, (err, result) => {
         if (err) throw err;
         res.send(result.ops);
       });
@@ -106,8 +110,7 @@ module.exports = (app, db) => {
       }};
       db.collection('users').updateOne(_query, _data, (err, result) => {
         if (err) throw err;
-        res.send(result.ops);
-        console.log(result.ops)
+        res.send(result);
       })
     });
 
