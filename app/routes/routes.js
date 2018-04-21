@@ -9,8 +9,6 @@ module.exports = (app, db) => {
                 case 'director': case 'title': {
                   if (req.query[property] !== undefined) {
                     _params[property] = {$regex: req.query[property]};
-                    // let  _regex = new RegExp(["^", req.query[property], "$"].join(""), "i");
-                    // _params[property] = _regex;
                   }
                   break;
                 }
@@ -18,6 +16,10 @@ module.exports = (app, db) => {
                   let _query = req.query[property].split(',');
                   _params[property] = {$all: _query};
                   break;
+                }
+                case 'rating': {
+                  _params[property] = parseInt(req.query[property]);
+                  break
                 }
                 default: {
                   _params[property] = req.query[property];
@@ -34,37 +36,33 @@ module.exports = (app, db) => {
     });
 
     app.get('/movies/:id', (req, res) => {
-        // res.send('GET /movies/id');
       let _objId = req.params.id;
-      console.log(_objId);
+      console.log('GET movie by _id', _objId);
       db.collection('movies').findOne(ObjectId(_objId), (err, result) => {
         if (err) throw err;
         res.send(result);
       });
     });
 
-    app.post('/movies', (req, res) => {
-        let _movie = {
-            title: req.body.title,
-            director: req.body.director,
-            year: req.body.year,
-            genre: req.body.genre,
-            rating: req.body.rating
-        };
-        db.collection('movies').insertOne(_movie, (error, result) => {
-            if (error) {
-                res.send({ 'error': 'An error has occured'} );
-                // res.status(500).json(error);
-            } else {
-                res.send(result.ops);
-            }
-        });
-        // res.send('POST /movies');
-    });
+    // app.post('/movies', (req, res) => {
+    //     let _movie = {
+    //         title: req.body.title,
+    //         director: req.body.director,
+    //         year: req.body.year,
+    //         genre: req.body.genre,
+    //         rating: req.body.rating
+    //     };
+    //     console.log('POST /movies');
+    //     db.collection('movies').insertOne(_movie, (err, result) => {
+    //         if (err) throw err;
+    //         res.send(result.ops);
+    //     });
+    // });
 
     app.post('/favs', (req, res) => {
       let _query = { _id: ObjectId(req.body.userId) };
       let _data = { $set: { 'favIds': req.body.favIds } };
+      console.log('Add to favs', _query);
       db.collection('users').updateOne(_query, _data, (err, result) => {
         if (err) throw err;
         res.send(result.ops);
@@ -72,7 +70,7 @@ module.exports = (app, db) => {
     });
 
     app.get('/users', (req, res) => {
-        // res.send('GET /users');
+      console.log('GET /users');
       db.collection('users').find({}).toArray((err, result) => {
         if (err) throw err;
         res.send(result);
@@ -80,13 +78,13 @@ module.exports = (app, db) => {
     });
 
     app.post('/users', (req, res) => {
-        // res.send('POST /users (sign_up)');
       let _user = {
         username: req.body.username,
         password: req.body.password,
         role: '1',
         favIds: []
       };
+      console.log('POST /users: create new user', _user);
       db.collection('users').insertOne(_user, (err, result) => {
         if (err) throw err;
         res.send(result.ops);
@@ -95,6 +93,7 @@ module.exports = (app, db) => {
 
     app.post('/delete_user', (req, res) => {
       let _query = { _id: ObjectId(req.body.userId) };
+      console.log('Delete user by _id', _query);
       db.collection('users').deleteOne(_query, (err, result) => {
         if (err) throw err;
         res.send(result.ops);
@@ -102,12 +101,12 @@ module.exports = (app, db) => {
     });
 
     app.post('/profile', (req, res) => {
-      // res.send('EDIT PROFILE');
       let _query = { _id: ObjectId(req.body.userId) };
       let _data = { $set: {
         'username': req.body.username,
         'password': req.body.password
       }};
+      console.log('Edit profile', _data);
       db.collection('users').updateOne(_query, _data, (err, result) => {
         if (err) throw err;
         res.send(result);
@@ -115,18 +114,19 @@ module.exports = (app, db) => {
     });
 
     app.post('/login', (req, res) => {
+      console.log('Login', req.body);
       db.collection('users').findOne({
         'username': req.body.username,
         'password': req.body.password
       }, (err, result) => {
         if (err) throw err;
-        console.log(result);
         res.send(result);
       });
     });
 
     app.post('/login/:id', (req, res) => {
       let _objId = req.params.id;
+      console.log('Verify user _id');
       db.collection('users').findOne(ObjectId(_objId), (err, result) => {
         if (err) throw err;
         res.send(result);
